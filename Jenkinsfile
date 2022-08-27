@@ -12,6 +12,19 @@ pipeline {
         sh 'mvn clean install'       
       }     
     }     
+    stage('Sonar Qube Analysis') {
+      agent {
+        docker {
+          image 'maven:amazoncorretto'
+          args '-v $HOME/.m2:/root/.m2'
+        }
+      }
+      steps {
+        withSonarQubeEnv(installationName:'SonarCloudSpace', credentialsId:'sona-cloud-key'){
+          sh 'mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar'
+        }
+      }
+    }
     stage('Docker Build') {
       agent any       
       steps {         
